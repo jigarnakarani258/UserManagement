@@ -185,10 +185,23 @@ const updateCurrentUserProfile = catchAsync(async (req, res, next) => {
   
 });
 
+const getAllUserList = catchAsync(async (req, res, next) => {  
+  let userList= await Users.find()
+
+  return res.status(200).send({
+    status: "success",
+    requestAt: req.requestTime,
+    NoResults: userList.length,
+    data: {
+      users: userList,
+    },
+  });
+});
 
 module.exports = { 
     SignUp,
     SignIn,
     getCurrentUser,
-    updateCurrentUserProfile
+    updateCurrentUserProfile,
+    getAllUserList
 }
