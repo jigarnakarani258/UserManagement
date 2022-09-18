@@ -1,8 +1,17 @@
 const { Users } = require('./../Models/userModel')
 const { catchAsync } = require('./../Utility/catchAsync')
 const { AppError } = require('../Utility/appError')
-const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
+
+// set up multer for storing uploaded files
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: "uploads",
+    filename: (req, file, cb) => {
+        cb(null, file.originalname + '-' + Date.now() ) 
+    }
+});
+const upload = multer({ storage: storage }).single('photo');
 
 const signToken = (id) =>{
     return jwt.sign({ id: id }, process.env.JWT_SECRETKEY, {
@@ -10,19 +19,46 @@ const signToken = (id) =>{
       });
 }
 
-const SignUp = catchAsync ( async (req , res, next) =>{
-    const newUser = await Users.create(req.body);
-    // const token = signToken(newUser._id);
-    res.status(201).json({
-        status : 'success',
-        //token : token,
-        data : {
-            newUser : newUser
+const SignUp = catchAsync(async (req, res, next) => {
+  upload(req, res, (err) => {
+    
+      const user = new Users({
+        name: req.body.name,
+        age: req.body.age,
+        gender: req.body.gender,
+        email: req.body.email,
+        password: req.body.password,
+        city: req.body.city,
+        state: req.body.state,
+        hobbies: req.body.hobbies,
+        Confirmpassword: req.body.Confirmpassword,
+        photo: {
+          data: req.file.filename,
+          contentType: "image/png",
         },
-        message : 'User SignUp Successfully!!'
-    })
-
-})
+      });
+      user
+        .save()
+        .then(() => {
+          res.status(201).json({
+            status: "success",
+            data: {
+              newUser: {
+                id : user._id,
+                email : user.email,
+                name : user.name 
+              },
+            },
+            message: "User SignUp Successfully!!",
+          });
+        })
+        .catch(err => {
+          return next(
+            new AppError(err.message, 400)
+          );
+        });   
+  });
+});
 
 const SignIn = catchAsync(async (req, res, next) => {
    const { email, password } = req.body;
