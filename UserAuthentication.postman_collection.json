@@ -1,0 +1,282 @@
+{
+	"info": {
+		"_postman_id": "d1668c10-2cbb-4851-80f4-9101573619e2",
+		"name": "UserAuthentication",
+		"description": "User Authentication Project give API's regarding user management. It provide Sign In , Sign Up , Get Current Profile , Update Profile , Get ALL User List , Upload File API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23434291"
+	},
+	"item": [
+		{
+			"name": "SignIn",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"test4@gmail.com\",\r\n    \"password\" : \"12121212\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/app/v1/SignIn",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"SignIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCurrentProfile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjg5NGZhZjk0ZTgyOWFlMmY1NzVmMiIsImVtYWlsIjoidGVzdDJAZ21haWwuY29tIiwiaWF0IjoxNjYzNjA0MDM3LCJleHAiOjE2OTUxNDAwMzd9.K763279mPdveZYyk5ZGYRQii-3_BXK3e0f5bmAitCz0",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/app/v1/GetCurrentProfile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"GetCurrentProfile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignUp",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "KK",
+							"type": "default"
+						},
+						{
+							"key": "gender",
+							"value": "Male",
+							"type": "default"
+						},
+						{
+							"key": "age",
+							"value": "22",
+							"type": "default"
+						},
+						{
+							"key": "email",
+							"value": "test2@gmail.com",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "KK123456",
+							"type": "default"
+						},
+						{
+							"key": "city",
+							"value": "Ahmedabad",
+							"type": "default"
+						},
+						{
+							"key": "state",
+							"value": "Gujarat",
+							"type": "default"
+						},
+						{
+							"key": "hobbies",
+							"value": "Music",
+							"type": "default"
+						},
+						{
+							"key": "hobbies",
+							"value": "dance",
+							"type": "default"
+						},
+						{
+							"key": "hobbies",
+							"value": "Cricket",
+							"type": "default"
+						},
+						{
+							"key": "Confirmpassword",
+							"value": "KK123456",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/help/OneDrive/Pictures/output1.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/app/v1/SignUp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"SignUp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateProfile",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjg5NGZhZjk0ZTgyOWFlMmY1NzVmMiIsImVtYWlsIjoidGVzdDJAZ21haWwuY29tIiwiaWF0IjoxNjYzNjA0MDk4LCJleHAiOjE2OTUxNDAwOTh9.sT3jBq_SuUBFXDs8hFNo7ptDnGgvFgKMoHI3CzPuO70",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "age",
+							"value": "20",
+							"type": "default"
+						},
+						{
+							"key": "name",
+							"value": "DJ1",
+							"type": "default"
+						},
+						{
+							"key": "city",
+							"value": "Bhavnagar",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/help/OneDrive/Pictures/Camera Roll/WIN_20220819_13_18_07_Pro.jpg"
+						},
+						{
+							"key": "password",
+							"value": "12121212",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/app/v1/UpdateProfile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"UpdateProfile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllUserList",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjg5NGZhZjk0ZTgyOWFlMmY1NzVmMiIsImVtYWlsIjoidGVzdDJAZ21haWwuY29tIiwiaWF0IjoxNjYzNjA0MDk4LCJleHAiOjE2OTUxNDAwOTh9.sT3jBq_SuUBFXDs8hFNo7ptDnGgvFgKMoHI3CzPuO70",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/app/v1/getAllUserList",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"getAllUserList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UploadFile",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjcxYzEyYmIyZDQxZDIwOTI4ZmM4YyIsImVtYWlsIjoidGVzdDRAZ21haWwuY29tIiwiaWF0IjoxNjYzNTA3NDkyLCJleHAiOjE2OTUwNDM0OTJ9.FSdqhW8W0I4aVd19PUhi2xYB82z3HEDUN6KROtk30Nc",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/D:/Workspace/UserAuthentication/data1.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/app/v1/UploadFile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"app",
+						"v1",
+						"UploadFile"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

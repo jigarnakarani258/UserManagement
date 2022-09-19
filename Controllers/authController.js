@@ -223,7 +223,7 @@ const UploadFile = catchAsync(async (req, res, next) => {
               newuser = response[0];
 
               //Default Password for NewUser Default@123
-              newuser.password = await bcrypt.hash("Default@123", 12);
+              newuser.password = "Default@123" //await bcrypt.hash("Default@123", 12);
               newuser.Confirmpassword = newuser.password;
               Users.create(newuser, (err, data) => {
                 if (err) {
@@ -262,7 +262,7 @@ const UploadFile = catchAsync(async (req, res, next) => {
           newuser.hobbies = result.Sheet1[0].G ;
 
           //Default Password for NewUser Default@123
-          newuser.password = await bcrypt.hash("Default@123", 12);
+          newuser.password = "Default@123" //await bcrypt.hash("Default@123", 12);
           newuser.Confirmpassword = newuser.password;
           
           Users.create(newuser, (err, data) => {
@@ -288,7 +288,7 @@ const UploadFile = catchAsync(async (req, res, next) => {
         }
       }
       else{
-        return next(new AppError("Please upload csv or excel file", 400));
+        return next(new AppError("Please upload a file", 400));
       }
     }
   });
