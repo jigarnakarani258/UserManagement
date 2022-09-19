@@ -1,5 +1,5 @@
 const express = require('express');
-const { SignUp , SignIn ,getCurrentUser, updateCurrentUserProfile , getAllUserList
+const { SignUp , SignIn ,getCurrentUser, updateCurrentUserProfile , getAllUserList,UploadFile
    } = require('../Controllers/authController')
 const passport = require('passport')
 const userRouter = express.Router();
@@ -12,6 +12,9 @@ userRouter.route("/GetCurrentProfile")
   .get( passport.authenticate("jwt", { session: false }), getCurrentUser);
 userRouter.route("/UpdateProfile")
   .put( passport.authenticate("jwt", { session: false }), updateCurrentUserProfile);
+ 
+userRouter.route("/UploadFile").post(UploadFile);
+
 
 userRouter.route('/getAllUserList')
   .get( passport.authenticate("jwt", { session: false }) ,getAllUserList)

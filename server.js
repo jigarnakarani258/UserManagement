@@ -9,8 +9,9 @@ process.on('uncaughtException',err=>{
 
 mongoose
   .connect(   
-    process.env.DATABASE_LOCAL,{                 
-    useNewUrlParser: true,
+    //process.env.DATABASE_LOCAL,{                 
+      process.env.DATABASE_REMOTE,{                 
+        useNewUrlParser: true,
     useUnifiedTopology: true
   })
   .then((con) => {

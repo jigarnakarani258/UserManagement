@@ -3,6 +3,9 @@ const { catchAsync } = require('./../Utility/catchAsync')
 const { AppError } = require('../Utility/appError')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const csv = require("csvtojson");
+const excelToJson = require("convert-excel-to-json");
+const path = require("path");
 
 // set up multer for storing uploaded files
 const multer = require('multer');
@@ -12,7 +15,7 @@ const storage = multer.diskStorage({
         cb(null, file.originalname + '-' + Date.now() ) 
     }
 });
-const upload = multer({ storage: storage }).single('photo');
+const upload = multer({ storage: storage }).single('file');
 
 const signToken = (id,email) =>{
     return jwt.sign({ id: id, email: email }, process.env.JWT_SECRETKEY, {
@@ -20,6 +23,7 @@ const signToken = (id,email) =>{
       });
 }
 
+//SignUp API
 const SignUp = catchAsync(async (req, res, next) => {
   upload(req, res, (err) => {
       if(err){
@@ -70,6 +74,7 @@ const SignUp = catchAsync(async (req, res, next) => {
   });
 });
 
+//SignIn API
 const SignIn = catchAsync(async (req, res, next) => {
    const { email, password } = req.body;
 
@@ -109,6 +114,7 @@ const SignIn = catchAsync(async (req, res, next) => {
 
 });
 
+//GetCurrentUser API , Authenticated with Passport JS
 const getCurrentUser = catchAsync(async (req, res, next) => {  
   const id = req.user._id
   let currentUser= await Users.findById(id)
@@ -119,6 +125,7 @@ const getCurrentUser = catchAsync(async (req, res, next) => {
     });
 });
 
+//UpdateCurrentUserProfile API , Authenticated with Passport JS
 const updateCurrentUserProfile = catchAsync(async (req, res, next) => { 
   upload(req, res,async (err) => {
       if(err){
@@ -185,6 +192,7 @@ const updateCurrentUserProfile = catchAsync(async (req, res, next) => {
   
 });
 
+//getAllUserList API , Authenticated with Passport JS
 const getAllUserList = catchAsync(async (req, res, next) => {  
   let userList= await Users.find()
 
@@ -198,10 +206,99 @@ const getAllUserList = catchAsync(async (req, res, next) => {
   });
 });
 
+//UploadFile API , User can upload csv or excel file and save their data.
+let newuser = {};
+const UploadFile = catchAsync(async (req, res, next) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return next(new AppError(err.message, 400));
+    } else {
+      if (req.file) {
+        const extension = path.extname(req.file.originalname);
+        if (extension == ".csv") {
+          csv()
+            .fromFile(`./uploads/${req.file.filename}`)
+            .then(async (response) => {
+              //I assume that csv file contains only one record of user(user wise csv file).
+              newuser = response[0];
+
+              //Default Password for NewUser Default@123
+              newuser.password = await bcrypt.hash("Default@123", 12);
+              newuser.Confirmpassword = newuser.password;
+              Users.create(newuser, (err, data) => {
+                if (err) {
+                  return next(new AppError(err.message, 400));
+                } else {
+                  res.status(201).json({
+                    status: "success",
+                    requestAt: req.requestTime,
+                    data: {
+                      newUser: {
+                        email : newuser.email,
+                        name : newuser.name
+                      },
+                    },
+                    message: "User SignUp Successfully!!",
+                  });
+                }
+              });
+            });
+        } else if (extension == ".xlsx") {
+          const result = excelToJson({
+            sourceFile: `./uploads/${req.file.filename}`,
+            header: {
+              rows: 1,
+            },
+          });
+
+          //I assume that excel file contains only one record of user with order of attributes
+          //name,age,gender,email,city,state,hobbies(user wise excel file).
+          newuser.name = result.Sheet1[0].A ;
+          newuser.age = result.Sheet1[0].B ;
+          newuser.gender = result.Sheet1[0].C ;
+          newuser.email = result.Sheet1[0].D ;
+          newuser.city = result.Sheet1[0].E ;
+          newuser.state = result.Sheet1[0].F ;
+          newuser.hobbies = result.Sheet1[0].G ;
+
+          //Default Password for NewUser Default@123
+          newuser.password = await bcrypt.hash("Default@123", 12);
+          newuser.Confirmpassword = newuser.password;
+          
+          Users.create(newuser, (err, data) => {
+                if (err) {
+                  return next(new AppError(err.message, 400));
+                } else {
+                  res.status(201).json({
+                    status: "success",
+                    requestAt: req.requestTime,
+                    data: {
+                      newUser: {
+                        email : newuser.email,
+                        name : newuser.name
+                      },
+                    },
+                    message: "User SignUp Successfully!!",
+                  });
+                }
+              });
+              
+        } else {
+          return next(new AppError("Please upload csv or excel file", 400));
+        }
+      }
+      else{
+        return next(new AppError("Please upload csv or excel file", 400));
+      }
+    }
+  });
+});
+
 module.exports = { 
     SignUp,
     SignIn,
     getCurrentUser,
     updateCurrentUserProfile,
-    getAllUserList
+    getAllUserList ,
+    UploadFile
 }
