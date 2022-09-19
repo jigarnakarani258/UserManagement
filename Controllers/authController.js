@@ -24,6 +24,7 @@ const signToken = (id,email) =>{
 }
 
 //SignUp API
+let user ;
 const SignUp = catchAsync(async (req, res, next) => {
   upload(req, res, (err) => {
       if(err){
@@ -33,21 +34,36 @@ const SignUp = catchAsync(async (req, res, next) => {
       }
       else
       {
-        const user = new Users({
-          name: req.body.name,
-          age: req.body.age,
-          gender: req.body.gender,
-          email: req.body.email,
-          password: req.body.password,
-          city: req.body.city,
-          state: req.body.state,
-          hobbies: req.body.hobbies,
-          Confirmpassword: req.body.Confirmpassword,
-          photo: {
-            data: req.file.filename,
-            contentType: "image/png",
-          },
-        });
+        if(req.file){
+           user = new Users({
+             name: req.body.name,
+             age: req.body.age,
+             gender: req.body.gender,
+             email: req.body.email,
+             password: req.body.password,
+             city: req.body.city,
+             state: req.body.state,
+             hobbies: req.body.hobbies,
+             Confirmpassword: req.body.Confirmpassword,
+             photo: {
+               data: req.file.filename,
+               contentType: "image/png",
+             },
+           });
+        }
+        else{
+          user = new Users({
+            name: req.body.name,
+            age: req.body.age,
+            gender: req.body.gender,
+            email: req.body.email,
+            password: req.body.password,
+            city: req.body.city,
+            state: req.body.state,
+            hobbies: req.body.hobbies,
+            Confirmpassword: req.body.Confirmpassword,
+          });
+        }  
         user
           .save()
           .then(() => {
@@ -79,8 +95,12 @@ const SignIn = catchAsync(async (req, res, next) => {
    const { email, password } = req.body;
 
   //1) Check email and password exists.
-  if (!email || !password) {
-    return next(new AppError('Please provide email and password', 400));
+  if (!email) {
+    return next(new AppError('Please provide email.', 400));
+  }
+
+  if (!password) {
+    return next(new AppError('Please provide password.', 400));
   }
 
   //2) Check if user exist
@@ -219,33 +239,42 @@ const UploadFile = catchAsync(async (req, res, next) => {
           csv()
             .fromFile(`./uploads/${req.file.filename}`)
             .then(async (response) => {
-              //I assume that csv file contains only one record of user(user wise csv file).
-              newuser = response[0];
+              if (response[0] === undefined) {
+                return next(
+                  new AppError(
+                    "CSV file not contains user details, please select valid CSV file.",
+                    400
+                  )
+                );
+              } else {
+                //I assume that csv file contains only one record of user(user wise csv file).
+                newuser = response[0];
 
-              //store hobbies in array
-              let hobbies = (newuser.hobbies).split(',')
-              newuser.hobbies = hobbies
+                //store hobbies in array
+                let hobbies = newuser.hobbies.split(",");
+                newuser.hobbies = hobbies;
 
-              //Default Password for NewUser Default@123
-              newuser.password = "Default@123" 
-              newuser.Confirmpassword = newuser.password;
-              Users.create(newuser, (err, data) => {
-                if (err) {
-                  return next(new AppError(err.message, 400));
-                } else {
-                  res.status(201).json({
-                    status: "success",
-                    requestAt: req.requestTime,
-                    data: {
-                      newUser: {
-                        email : newuser.email,
-                        name : newuser.name
+                //Default Password for NewUser Default@123
+                newuser.password = "Default@123";
+                newuser.Confirmpassword = newuser.password;
+                Users.create(newuser, (err, data) => {
+                  if (err) {
+                    return next(new AppError(err.message, 400));
+                  } else {
+                    res.status(201).json({
+                      status: "success",
+                      requestAt: req.requestTime,
+                      data: {
+                        newUser: {
+                          email: newuser.email,
+                          name: newuser.name,
+                        },
                       },
-                    },
-                    message: "User SignUp Successfully!!",
-                  });
-                }
-              });
+                      message: "User SignUp Successfully!!",
+                    });
+                  }
+                });
+              }
             });
         } else if (extension == ".xlsx") {
           const result = excelToJson({
@@ -255,40 +284,47 @@ const UploadFile = catchAsync(async (req, res, next) => {
             },
           });
 
-          //I assume that excel file contains only one record of user with order of attributes
-          //name,age,gender,email,city,state,hobbies(user wise excel file).
-          newuser.name = result.Sheet1[0].A ;
-          newuser.age = result.Sheet1[0].B ;
-          newuser.gender = result.Sheet1[0].C ;
-          newuser.email = result.Sheet1[0].D ;
-          newuser.city = result.Sheet1[0].E ;
-          newuser.state = result.Sheet1[0].F ;
-          
-          //store hobbies in array
-          let hobbies = (result.Sheet1[0].G).split(',')
-          newuser.hobbies = hobbies
+          if (result.Sheet1[0] === undefined) {
+            return next(
+              new AppError("Excel file not contains user details, please select valid excel file.", 400)
+            );
+          } else {
+            //I assume that excel file contains only one record of user with order of attributes
+            //name,age,gender,email,city,state,hobbies(user wise excel file).
+            newuser.name = result.Sheet1[0].A;
+            newuser.age = result.Sheet1[0].B;
+            newuser.gender = result.Sheet1[0].C;
+            newuser.email = result.Sheet1[0].D;
+            newuser.city = result.Sheet1[0].E;
+            newuser.state = result.Sheet1[0].F;
 
-          //Default Password for NewUser Default@123
-          newuser.password = "Default@123" 
-          newuser.Confirmpassword = newuser.password;
+            //store hobbies in array
+            let hobbies = result.Sheet1[0].G.split(",");
+            newuser.hobbies = hobbies;
 
-          Users.create(newuser, (err, data) => {
-                if (err) {
-                  return next(new AppError(err.message, 400));
-                } else {
-                  res.status(201).json({
-                    status: "success",
-                    requestAt: req.requestTime,
-                    data: {
-                      newUser: {
-                        email : newuser.email,
-                        name : newuser.name
-                      },
+            //Default Password for NewUser Default@123
+            newuser.password = "Default@123";
+            newuser.Confirmpassword = newuser.password;
+
+            Users.create(newuser, (err, data) => {
+              if (err) {
+                return next(new AppError(err.message, 400));
+              } else {
+                res.status(201).json({
+                  status: "success",
+                  requestAt: req.requestTime,
+                  data: {
+                    newUser: {
+                      email: newuser.email,
+                      name: newuser.name,
                     },
-                    message: "User SignUp Successfully!!",
-                  });
-                }
-              });
+                  },
+                  message: "User SignUp Successfully!!",
+                });
+              }
+            });
+          }
+         
               
         } else {
           return next(new AppError("Please upload csv or excel file", 400));
