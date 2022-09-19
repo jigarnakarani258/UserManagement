@@ -222,8 +222,12 @@ const UploadFile = catchAsync(async (req, res, next) => {
               //I assume that csv file contains only one record of user(user wise csv file).
               newuser = response[0];
 
+              //store hobbies in array
+              let hobbies = (newuser.hobbies).split(',')
+              newuser.hobbies = hobbies
+
               //Default Password for NewUser Default@123
-              newuser.password = "Default@123" //await bcrypt.hash("Default@123", 12);
+              newuser.password = "Default@123" 
               newuser.Confirmpassword = newuser.password;
               Users.create(newuser, (err, data) => {
                 if (err) {
@@ -259,12 +263,15 @@ const UploadFile = catchAsync(async (req, res, next) => {
           newuser.email = result.Sheet1[0].D ;
           newuser.city = result.Sheet1[0].E ;
           newuser.state = result.Sheet1[0].F ;
-          newuser.hobbies = result.Sheet1[0].G ;
+          
+          //store hobbies in array
+          let hobbies = (result.Sheet1[0].G).split(',')
+          newuser.hobbies = hobbies
 
           //Default Password for NewUser Default@123
-          newuser.password = "Default@123" //await bcrypt.hash("Default@123", 12);
+          newuser.password = "Default@123" 
           newuser.Confirmpassword = newuser.password;
-          
+
           Users.create(newuser, (err, data) => {
                 if (err) {
                   return next(new AppError(err.message, 400));
